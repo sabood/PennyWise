@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { categoryDetails } from '@/lib/data';
 import type { Budget } from '@/types';
+import { useState, useEffect } from 'react';
 
 interface BudgetCardProps {
   budget: Budget;
@@ -15,11 +16,14 @@ export function BudgetCard({ budget, spent }: BudgetCardProps) {
   const progress = Math.min((spent / limit) * 100, 100);
   const remaining = limit - spent;
   
-  const getProgressColor = () => {
-    if (progress > 90) return 'bg-red-500';
-    if (progress > 75) return 'bg-yellow-500';
-    return 'bg-primary';
-  }
+  const [progressColor, setProgressColor] = useState('');
+
+  useEffect(() => {
+    if (progress > 90) setProgressColor('bg-red-500');
+    else if (progress > 75) setProgressColor('bg-yellow-500');
+    else setProgressColor('bg-primary');
+  }, [progress]);
+
 
   return (
     <Card>
@@ -35,7 +39,7 @@ export function BudgetCard({ budget, spent }: BudgetCardProps) {
         <p className={`text-xs ${remaining >= 0 ? 'text-muted-foreground' : 'text-red-500'}`}>
           {remaining >= 0 ? `$${remaining.toLocaleString()} left` : `$${Math.abs(remaining).toLocaleString()} over`}
         </p>
-        <Progress value={progress} className="mt-4 h-2" indicatorClassName={getProgressColor()} />
+        <Progress value={progress} className="mt-4 h-2" indicatorClassName={progressColor} />
       </CardContent>
     </Card>
   );
