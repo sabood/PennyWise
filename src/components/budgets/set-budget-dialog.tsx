@@ -1,3 +1,4 @@
+
 'use client';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -21,9 +22,13 @@ import {
 } from '@/components/ui/select';
 import { categoryDetails } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
-import type { CategoryName } from '@/types';
+import type { CategoryName, Budget } from '@/types';
 
-export function SetBudgetDialog() {
+interface SetBudgetDialogProps {
+    onBudgetSet: (budget: Budget) => void;
+}
+
+export function SetBudgetDialog({ onBudgetSet }: SetBudgetDialogProps) {
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState<CategoryName | ''>('');
   const [limit, setLimit] = useState('');
@@ -40,13 +45,16 @@ export function SetBudgetDialog() {
       setError('Please fill out all fields.');
       return;
     }
-    if (isNaN(Number(limit)) || Number(limit) <= 0) {
+    const numericLimit = Number(limit)
+    if (isNaN(numericLimit) || numericLimit <= 0) {
       setError('Please enter a valid positive number for the limit.');
       return;
     }
     setError('');
-    console.log({ category, limit: Number(limit) });
-    // Here you would typically call an action to save the budget
+    
+    const newBudget: Budget = { category, limit: numericLimit };
+    onBudgetSet(newBudget);
+
     toast({
       title: 'Success!',
       description: `Budget for ${category} has been set to $${limit}.`,
